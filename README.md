@@ -1,28 +1,28 @@
 # Introduction
-This small collection of bash scripts adds the functionality to the [Gargoyle
-firmware](https://www.gargoyle-router.com/) firmware to dynamically adjust
-free quotas. This is useful for capped data plans where bandwidth throttling is
-enabled if a specific monthly amount of data is exceeded.
+With this small collection of bash scripts for the [Gargoyle
+firmware](https://www.gargoyle-router.com/) you can dynamically adjust
+free quotas hourly. This is useful for capped data plans. These throttle the 
+bandwidth if a specific amount of data is exceeded.
 A monthly fixed quota for each user derived by dividing this total available
 amount of data has disadvantages:
-1. Any not used quota of one user cannot be used by the other users.
+1. Any of one user unused quota cannot be used by the other users.
 2. A user can (unintentionally) use all his quota at the beginning of the month
 because he can.
 
-To mitigate the last problem one could come with the idea to set daily quotas.
-Not alone does this not solve the first problem but it intensifies it because
-each daily not used quota decays and cannot only not be used by the other user
-but is also inaccessible for the same user on the next day.
+To mitigate the last problem one could come up with the idea to set daily quotas.
+Not alone does this not solve the first problem but it intensifies it. Each daily
+unused quota decays at the end of each day and cannot be used on the following day
+anymore.
 
 This tool tries to tackle both problems:
-It sets at the beginning of the month for each user a small quota.
-To solve the second problem each hour the quota of each user is increased a
-little bit. Such the monthly quota cannot used at once because it is distributed
-evenly among the month.
-The first problem is solved limit the not used quota each user can have and
-distribute it among the other users. This limit is decreased at the end of the
-month to allow all users to make use off the total amount of data available of
-the internet connection.
+At the beginning of the month it sets for each user a small quota.
+To solve the second problem it runs hourly and increases all quotas a
+little bit. Therefore the monthly quota cannot be used at once because it 
+is distributed evenly among the month, so the second problem is solved.
+The first problem is solved by limiting the unused quota each user can save up
+and distribute any exceeding quotas among the other users. 
+This limit is decreased at the end of the month to allow all users to make use 
+off the total amount of data available in the data plan.
 
 # Setup
 In this setup we are going to exemplary distribute a monthly amount 30 GB to
@@ -39,10 +39,9 @@ Quota Resets: Every Month
 Quota is Active: Always
 When Exceeded: throttle bandwidth to a very low value
 ```
-Click on Add New Quota and on Save Changes.
 
 To prevent that any new devices are not sorted in these ip ranges and are therefore
-not affected by the quotas, set the DHCP range to for example
+not affected by the quotas, set the DHCP ip range to for example
 192.168.1.100 - 192.168.1.250
 and add a third quota rule which effectively stops internet usage for these devices:
 ```
@@ -55,18 +54,18 @@ When Exceeded: throttle bandwidth to a very low value
 
 ## Create config file
 Clone this repository on your local machine, change to the repository
-directory and create a config file from the example file
+directory and create a config file *config.sh* from the example file
 ```bash
 cp config-example.sh config.sh
 ```
-Add/adjust then for each user a lines like
+Add/adjust then for each user lines like
 ```bash
 user2="Alice"; iprange2="192.168.1.50-192.168.1.59"; monthly_quota2=$((20*gigabye))
 user1="Bob"; iprange1="192.168.1.60-192.168.1.69"; monthly_quota1=$((10*gigabye))
 ```
 **Do not forget to adjust nusers accordingly!**
 There are some more settings like the maximal savings which may be useful to consider.
-If you would like to get a notification mail, you should also have a look at the mail settings.
+If you like to get a mail with the logs you should also have a look at the mail settings.
 
 ## Deploy script on router
 Copy the git repository to the router (here the git config entry *gargoyle* is used):
@@ -74,11 +73,9 @@ Copy the git repository to the router (here the git config entry *gargoyle* is u
 scp *.sh gargoyle:~/gargoyle-flexible-quotas/
 ```
 Establish a SSH connection to the router and run
-
 ```
 crontab -e
 ```
-
 and add this entry, to run the script every hour:
 ```bash
 1 * * * * /root/gargoyle-flexible-quotas/flexible-quotas.sh > /root/flexible-quotas-hourly.log 2>&1
