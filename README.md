@@ -78,7 +78,7 @@ crontab -e
 ```
 and add this entry, to run the script every hour:
 ```bash
-1 * * * * /root/gargoyle-flexible-quotas/flexible-quotas.sh > /root/flexible-quotas-hourly.log 2>&1
+1 * * * * /root/gargoyle-flexible-quotas/update-quotas.sh > /root/flexible-quotas-hourly.log 2>&1
 ```
 To email the logs make sure to add some email credentials to the config file and add
 ```
