@@ -82,7 +82,7 @@ and add this entry, to run the script every hour:
 ```
 To email the logs make sure to add some email credentials to the config file and add
 ```
-2 * * * * /root/gargoyle-flexible-quotas/send-mail-hourly.sh > /root/mailsend.log 2>&1
+2 * * * * /root/gargoyle-flexible-quotas/send-mail-hourly.sh /root/flexible-quotas-hourly.log > /root/mailsend.log 2>&1
 ```
 
 # Support
