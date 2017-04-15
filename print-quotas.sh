@@ -7,6 +7,7 @@ scriptpath="$( cd "$(dirname "$0")" ; pwd -P )"
 
 echo "== Print free bandwidths. =="
 
-get_free_bandwidths
+get_free_data
+print_statistic_table
 
 exit

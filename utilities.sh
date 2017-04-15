@@ -77,7 +77,6 @@ get_free_data() {
         array_write "used_data" $i $used_data
         array_write "current_limit" $i $current_limit
         array_write "free_data" $i $free_data
-        echo
     done
 }
 
@@ -100,7 +99,7 @@ print_statistic_table() {
         username=$(array_read "user" $i)
         used_data=$(array_read "used_data" $i)
         current_limit=$(array_read "current_limit" $i)
-        free_data=$(array_write "free_data" $i)
+        free_data=$(array_read "free_data" $i)
         printf "$format" $i $username "$(to_MB $used_data)" "$(to_MB $current_limit)" "$(to_MB $free_data)"
         echo
     done

@@ -27,9 +27,10 @@ echo "Current statistics:"
 print_statistic_table
 
 # Abort if left day in months are below $stop_distribution_days_before
-if [ "$left_days" -leq 0 ]; then
-    echo "Not left days. Do not distribute add any new data."
+if [ "$left_days" -le 0 ]; then
+    echo "Not left days. Do not distribute any new data."
     exit 0
+fi
 
 if [ "$current_day" -eq 1 ] && [ "$current_hour" -eq 0 ]; then
     # Reset free  to $start_quota at the 1. of the month at 00:01
@@ -60,7 +61,7 @@ done
 
 echo "Total left quota:" $(to_MB $total_left_quota) "/" $(to_MB total_quota)s
 if [ "$total_left_quota" -lt 0 ]; then
-    echo "A negative quota should not happen, set to defaul 1000 MB"
+    echo "A negative quota should not happen, set to default 1000 MB"
     total_left_quota=1000000000
 fi
 

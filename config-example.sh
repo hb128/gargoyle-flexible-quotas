@@ -22,9 +22,9 @@ stop_distribution_days_before=1
 
 ## Users
 
-nusers=4
-user2="Alice"; iprange2="192.168.1.50-192.168.1.59"; monthly_quota2=$((20*gigabye))
-user1="Bob"; iprange1="192.168.1.60-192.168.1.69"; monthly_quota1=$((10*gigabye))
+nusers=2
+user1="Bob"; iprange1="192.168.1.60-192.168.1.69"; monthly_quota1=$((10*gigabyte))
+user2="Alice"; iprange2="192.168.1.50-192.168.1.59"; monthly_quota2=$((20*gigabyte))
 
 ## Mail settings
 
