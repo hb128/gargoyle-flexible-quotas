@@ -12,25 +12,21 @@ current_day=$(no_leading_zeros $(date +%d))
 current_hour=$(no_leading_zeros $(date +%H))
 left_days=$((days_this_month - current_day - stop_distribution_days_before))
 left_hours=$((left_days * 24 + (24 - current_hour)))
-echo "This is day $current_day/$days_this_month."
-echo "When stopping $stop_distribution_days_before days before the end of the month, $left_days days or $left_hours hours are left."
+echo "This is day $current_day/$days_this_month. $(get_max $left_days 0) days or $(get_max $left_hours 0) hours are left to distribute left quota."
 
-echo "Maximal savings:" $(to_MB $maximal_savings)
-# Lower maximal savings the last $lower_maximum_before_month_end days
-if [ "$left_days" -le "$start_maximum_lowering" ]; then
+if [ "$left_days" -le "$start_maximum_lowering" ] && [ "$left_days" -ge 0 ]; then
+    # Lower maximal savings the last $lower_maximum_before_month_end days
     maximal_savings=$(($lowest_maximum + ($maximal_savings - $lowest_maximum) * $left_days / $start_maximum_lowering))
     echo "Lower maximal savings to:" $(to_MB $maximal_savings)
+elif [ "$left_days" -lt 0 ]; then
+    # Set maximal saving to minimum when distribution phase stops
+    maximal_savings=$lowest_maximum
+    echo "Set maximal savings to minimum:" $(to_MB $maximal_savings)    
 fi
 
 get_free_data
 echo "Current statistics:"
 print_statistic_table
-
-# Abort if left day in months are below $stop_distribution_days_before
-if [ "$left_days" -le 0 ]; then
-    echo "Not left days. Do not distribute any new data."
-    exit 0
-fi
 
 if [ "$current_day" -eq 1 ] && [ "$current_hour" -eq 0 ]; then
     # Reset free  to $start_quota at the 1. of the month at 00:01
@@ -65,22 +61,27 @@ if [ "$total_left_quota" -lt 0 ]; then
     total_left_quota=1000000000
 fi
 
-# Increment free data for all users.
+# Increment free data for all users if left hours is above 0
 total_distributed_data=0
 total_increment_data=0
-for i in `seq $nusers`;do
-    array_write "free_data_before" $i $(array_read "free_data" $i)
-    current_limit=$(array_read "current_limit" $i)
-    free_data=$(array_read "free_data" $i)
-    monthly_quota=$(array_read "monthly_quota" $i)
-    monthly_quota=$((monthly_quota * quota_factor))
-    increment_data=$(((total_left_quota * ((monthly_quota) / (total_quota / 1000)) / left_hours) / 1000))
-    echo "$i) Add" $(to_MB $increment_data)
-    free_data=$((free_data + increment_data))
-    array_write "free_data" $i $free_data
-    total_distributed_data=$((total_distributed_data + current_limit + increment_data))
-    total_increment_data=$((total_increment_data + increment_data))
-done
+if [ "$left_hours" -gt 0 ]; then
+    for i in `seq $nusers`;do
+        array_write "free_data_before" $i $(array_read "free_data" $i)
+        current_limit=$(array_read "current_limit" $i)
+        free_data=$(array_read "free_data" $i)
+        monthly_quota=$(array_read "monthly_quota" $i)
+        monthly_quota=$((monthly_quota * quota_factor))
+        # Weight Total left quota with relative monthly quota 
+        increment_data=$(((total_left_quota * ((monthly_quota) / (total_quota / 1000)) / left_hours) / 1000))
+        echo "$i) Add" $(to_MB $increment_data)
+        free_data=$((free_data + increment_data))
+        array_write "free_data" $i $free_data
+        total_distributed_data=$((total_distributed_data + current_limit + increment_data))
+        total_increment_data=$((total_increment_data + increment_data))
+    done
+else
+    echo "No hours left. Do not distribute any new data."
+fi   
 
 # Check if any free data is above maximal allowed savings.
 data_to_share=0
@@ -151,9 +152,7 @@ if [ "$increment_diff" -lt 0 ]; then
     increment_diff=$((- increment_diff))
 fi
 maximal_margin=50
-if [ "$increment_diff" -le "$maximal_margin" ]; then
-    echo "Added data checksum is in a $maximal_margin Byte margin OK"
-else
+if [ "$increment_diff" -gt "$maximal_margin" ]; then
     echo "Added data checksum not OK!"
     echo "Checksum of " $increment_data_checksum "is not indended increment of" $total_increment_data
 fi

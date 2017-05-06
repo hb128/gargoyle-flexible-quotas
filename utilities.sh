@@ -29,6 +29,16 @@ days_in_month () {
     echo $days
 }
 
+# Return max of $1 and $2
+get_max () {
+    echo $(( $1 > $2 ? $1 : $2 ))
+}
+
+# Return max of $1 and $2
+get_min () {
+    echo $(( $1 < $2 ? $1 : $2 ))
+}
+
 # Remove any leading zeros of number $1
 no_leading_zeros () {
     number=$(echo $1 | sed 's/^0*//')
@@ -103,6 +113,7 @@ print_statistic_table() {
         printf "$format" $i $username "$(to_MB $used_data)" "$(to_MB $current_limit)" "$(to_MB $free_data)"
         echo
     done
+    echo
 }
 
 # Update the combined limits in the firewall rules
