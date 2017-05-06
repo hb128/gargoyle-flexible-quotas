@@ -21,7 +21,7 @@ if [ "$left_days" -le "$start_maximum_lowering" ] && [ "$left_days" -ge 0 ]; the
 elif [ "$left_days" -lt 0 ]; then
     # Set maximal saving to minimum when distribution phase stops
     maximal_savings=$lowest_maximum
-    echo "Set maximal savings to minimum:" $(to_MB $maximal_savings)    
+    echo "Set maximal savings to minimum:" $(to_MB $maximal_savings)
 fi
 
 get_free_data
@@ -71,7 +71,7 @@ if [ "$left_hours" -gt 0 ]; then
         free_data=$(array_read "free_data" $i)
         monthly_quota=$(array_read "monthly_quota" $i)
         monthly_quota=$((monthly_quota * quota_factor))
-        # Weight Total left quota with relative monthly quota 
+        # Weight Total left quota with relative monthly quota
         increment_data=$(((total_left_quota * ((monthly_quota) / (total_quota / 1000)) / left_hours) / 1000))
         echo "$i) Add" $(to_MB $increment_data)
         free_data=$((free_data + increment_data))
@@ -81,7 +81,7 @@ if [ "$left_hours" -gt 0 ]; then
     done
 else
     echo "No hours left. Do not distribute any new data."
-fi   
+fi
 
 # Check if any free data is above maximal allowed savings.
 data_to_share=0

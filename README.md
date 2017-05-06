@@ -1,7 +1,7 @@
 # Introduction
 With this small collection of bash scripts for the [Gargoyle
 firmware](https://www.gargoyle-router.com/) you can dynamically adjust
-free quotas hourly. This is useful for capped data plans. These throttle the 
+free quotas hourly. This is useful for capped data plans. These throttle the
 bandwidth if a specific amount of data is exceeded.
 A monthly fixed quota for each user derived by dividing this total available
 amount of data has disadvantages:
@@ -17,11 +17,11 @@ anymore.
 This tool tries to tackle both problems:
 At the beginning of the month it sets for each user a small quota.
 To solve the second problem it runs hourly and increases all quotas a
-little bit. Therefore the monthly quota cannot be used at once because it 
+little bit. Therefore the monthly quota cannot be used at once because it
 is distributed evenly among the month, so the second problem is solved.
 The first problem is solved by limiting the unused quota each user can save up
-and distribute any exceeding quotas among the other users. 
-This limit is decreased at the end of the month to allow all users to make use 
+and distribute any exceeding quotas among the other users.
+This limit is decreased at the end of the month to allow all users to make use
 off the total amount of data available in the data plan.
 
 # Setup
