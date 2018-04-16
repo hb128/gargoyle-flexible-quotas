@@ -57,7 +57,8 @@ get_used_data () {
     # Remove trailing comma
     local used=${used%?}
     if [ ! "$used" ]; then
-        exit "No quotaUsed found, used=$used. Abort!"
+        # "No quotaUsed found. Return 0"
+	echo 0
     fi
     echo $used
 }
@@ -67,7 +68,7 @@ get_limit () {
     local quota_id=$1
     local limit=$(uci get firewall.$quota_id.combined_limit)
     if [ ! $limit ]; then
-        exit "No combined_limit with id=$quota_id found, used=$limit. Abort!"
+	echo 0
     fi
     echo $limit
 }
